@@ -20,4 +20,5 @@ jobs:
         go-version: '1.22'
 
     - name: Run Integration Tests
-      run: go test -v -tags=integration ./tests/integration/...
+      working-directory: tests/integration
+      run: go test -v -tags=integration ./...

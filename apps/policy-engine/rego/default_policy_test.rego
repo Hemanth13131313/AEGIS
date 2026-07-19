@@ -1,8 +1,8 @@
-package aegis.policy.default_test
+package aegis.policy.core_test
 
 import rego.v1
-import data.aegis.policy.default.allow
-import data.aegis.policy.default.deny
+import data.aegis.policy.core.allow
+import data.aegis.policy.core.deny
 
 # --- Allow path tests ---
 

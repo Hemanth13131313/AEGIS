@@ -1,4 +1,4 @@
-package aegis.policy.default
+package aegis.policy.core
 
 default allow = true
 
