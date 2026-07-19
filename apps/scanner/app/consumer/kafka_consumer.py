@@ -112,20 +112,20 @@ class ScannerKafkaConsumer:
         # payload is not forwarded via Kafka for privacy; scanning metadata/hash or fetched payload later
         verdict_result = await self.scanner.scan(payload="", context=event.metadata)
         
-        if verdict_result["verdict"] in ["block", "tag", "redact"]:
+        if verdict_result.action.value in ["block", "tag", "redact"]:
             detection = DetectionEventMessage(
                 id=event.id, # using event ID or new UUID
                 event_id=event.id,
                 session_id=event.session_id,
-                category=verdict_result.get("category", "unknown"),
-                confidence=verdict_result.get("confidence", 1.0),
-                action_taken=verdict_result["verdict"],
-                owasp_llm_id="LLM01", # mock for now
-                atlas_technique="AML.T0000", # mock
+                category=verdict_result.owasp_category or "unknown",
+                confidence=verdict_result.confidence,
+                action_taken=verdict_result.action.value,
+                owasp_llm_id=verdict_result.owasp_category or "LLM01", # mock for now
+                atlas_technique=verdict_result.atlas_technique or "AML.T0000", # mock
                 policy_ref=event.policy_ref,
-                model_a_verdict=verdict_result.get("model_a_verdict", "unknown"),
-                model_b_verdict=verdict_result.get("model_b_verdict", "unknown"),
-                disagreement=False,
+                model_a_verdict=verdict_result.model_a_verdict,
+                model_b_verdict=verdict_result.model_b_verdict,
+                disagreement=verdict_result.disagreement,
                 ts=datetime.now(timezone.utc).isoformat()
             )
             self.producer.produce(detection)

@@ -12,7 +12,7 @@ import structlog
 from confluent_kafka import Consumer, KafkaError
 
 from app.consumer.detection_producer import DetectionEventMessage, DetectionProducer
-from app.monitor.rag_monitor import RAGMonitor
+from app.monitor import RAGMonitor, RetrievalEvent
 
 logger = structlog.get_logger(__name__)
 
@@ -101,14 +101,16 @@ class RAGKafkaConsumer:
 
     async def _process_event(self, event: RAGEventMessage) -> None:
         # Pass data to monitor
-        is_anomalous = await self.monitor.analyze_retrieval_event(
-            event.session_id,
-            event.chunks,
-            event.chunk_embeddings,
-            event.scores
+        retrieval_event = RetrievalEvent(
+            session_id=event.session_id,
+            query_embedding=[],
+            retrieved_chunks=event.chunks,
+            retrieval_scores=event.scores,
+            top_k=len(event.chunks)
         )
+        verdict = await self.monitor.analyze_retrieval_event(retrieval_event)
         
-        if is_anomalous:
+        if verdict.is_anomalous:
             detection = DetectionEventMessage(
                 id=str(uuid.uuid4()),
                 event_id=event.id,

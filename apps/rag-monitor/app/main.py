@@ -9,10 +9,9 @@ from contextlib import asynccontextmanager
 import structlog
 from fastapi import FastAPI, Request
 
-from app.api.routes import router
 from app.consumer.detection_producer import DetectionProducer
 from app.consumer.kafka_consumer import KafkaConsumerConfig, RAGKafkaConsumer
-from app.monitor.rag_monitor import RAGMonitor
+from app.monitor import RAGMonitor
 
 logger = structlog.get_logger(__name__)
 
@@ -57,7 +56,7 @@ async def request_id_middleware(request: Request, call_next):
         response.headers["X-Request-ID"] = req_id
         return response
 
-app.include_router(router, prefix="/api/v1")
+
 
 @app.get("/health")
 async def health_check():

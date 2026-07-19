@@ -95,7 +95,7 @@ class RedTeamRunner:
             payload = {
                 "session_id": str(uuid.uuid4()),
                 "request_id": str(uuid.uuid4()),
-                "prompt": case.prompt,
+                "payload": case.prompt,
                 "context": {"redteam": True, "case_id": case.id}
             }
             
