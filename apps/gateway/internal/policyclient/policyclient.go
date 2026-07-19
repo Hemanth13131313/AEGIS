@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"aegis/apps/gateway/internal/identity"
+	"github.com/aegis-security/aegis/apps/gateway/internal/identity"
 
 	"go.uber.org/zap"
 	"google.golang.org/grpc"

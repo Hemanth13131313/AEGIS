@@ -9,12 +9,12 @@ import (
 	"syscall"
 	"time"
 
-	"aegis/apps/gateway/internal/auth"
-	"aegis/apps/gateway/internal/identity"
-	"aegis/apps/gateway/internal/policyclient"
-	"aegis/apps/gateway/internal/proxy"
-	"aegis/apps/gateway/internal/sanitize"
-	"aegis/apps/gateway/internal/telemetry"
+	"github.com/aegis-security/aegis/apps/gateway/internal/auth"
+	"github.com/aegis-security/aegis/apps/gateway/internal/identity"
+	"github.com/aegis-security/aegis/apps/gateway/internal/policyclient"
+	"github.com/aegis-security/aegis/apps/gateway/internal/proxy"
+	"github.com/aegis-security/aegis/apps/gateway/internal/sanitize"
+	"github.com/aegis-security/aegis/apps/gateway/internal/telemetry"
 
 	"github.com/go-chi/chi/v5"
 	"go.uber.org/zap"

@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/aegis/policy-engine/internal/export"
+	"github.com/aegis-security/aegis/apps/policy-engine/internal/export"
 )
 
 type ConfigSyslogRequest struct {
