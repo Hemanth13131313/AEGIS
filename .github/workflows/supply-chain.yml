@@ -26,6 +26,16 @@ jobs:
     - name: Install Trivy
       uses: aquasecurity/setup-trivy@e07451d2e059ed86c2870430ea286b3a9e0bf241
 
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.22'
+
+    - name: Generate go.sum
+      run: |
+        cd apps/gateway && go mod tidy
+        cd ../policy-engine && go mod tidy
+
     - name: Build images
       run: |
         docker build -t aegis-gateway:${{ github.sha }} apps/gateway
