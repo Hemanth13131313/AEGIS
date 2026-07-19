@@ -18,7 +18,6 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"go.uber.org/zap"
-	"google.golang.org/grpc"
 )
 
 func main() {
@@ -79,9 +78,8 @@ func main() {
 	}()
 
 	// gRPC Server (Stubbed for Phase 2)
-	grpcSrv := grpc.NewServer()
-	policySrv := grpcserver.NewServer(resolver, evaluator, logger)
-	policySrv.Register(grpcSrv)
+	cfg := grpcserver.ServerConfig{Addr: grpcAddr}
+	grpcSrv := grpcserver.NewGRPCServer(cfg, logger)
 
 	// Shutdown handling
 	quit := make(chan os.Signal, 1)

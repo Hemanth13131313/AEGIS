@@ -1,13 +1,9 @@
 package proxy
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
-
-	"github.com/aegis-security/aegis/apps/gateway/internal/policyclient"
-	"go.uber.org/zap"
 )
 
 // PolicyBlockError is returned when a request is blocked by policy.
