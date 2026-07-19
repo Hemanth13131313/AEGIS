@@ -31,7 +31,6 @@ type ReverseProxy struct {
 	config    Config
 	logger    *zap.Logger
 	proxy     *httputil.ReverseProxy
-	sanitizer Sanitizer
 }
 
 // APIError represents the standard AEGIS error shape.
