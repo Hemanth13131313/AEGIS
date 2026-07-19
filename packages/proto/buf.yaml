@@ -1,0 +1,9 @@
+version: v2
+modules:
+  - path: .
+linting:
+  use:
+    - DEFAULT
+breaking:
+  use:
+    - FILE

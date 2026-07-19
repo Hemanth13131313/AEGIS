@@ -1,0 +1,43 @@
+replicaCount: 1
+
+image:
+  repository: aegis-scanner
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+service:
+  type: ClusterIP
+  port: 8000
+
+env:
+  AEGIS_SCANNER_MODEL_A: "llama3-8b"
+  AEGIS_SCANNER_MODEL_B: "mistral-7b"
+  AEGIS_BUS_BROKERS: "kafka:9092"
+  AEGIS_OTEL_EXPORTER_ENDPOINT: "otelcol:4317"
+
+resources:
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+  requests:
+    cpu: 200m
+    memory: 512Mi
+
+livenessProbe:
+  httpGet:
+    path: /health
+    port: 8000
+
+readinessProbe:
+  httpGet:
+    path: /health
+    port: 8000
+
+serviceAccount:
+  create: true
+  name: "aegis-scanner"
+
+podAnnotations:
+  spiffe.io/spiffe-id: true
+
+# TODO: Add KEDA ScaledObject placeholder here

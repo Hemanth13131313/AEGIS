@@ -1,0 +1,37 @@
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: aegis-scanner-scaler
+  namespace: aegis
+spec:
+  scaleTargetRef:
+    name: aegis-scanner
+  minReplicaCount: 2
+  maxReplicaCount: 20
+  cooldownPeriod: 30
+  triggers:
+    - type: kafka
+      metadata:
+        bootstrapServers: kafka.aegis.svc.cluster.local:9092
+        consumerGroup: aegis-scanner
+        topic: aegis.events.raw
+        lagThreshold: "1000"  # scale up when 1000+ messages unprocessed
+        offsetResetPolicy: earliest
+---
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: aegis-rag-monitor-scaler
+  namespace: aegis
+spec:
+  scaleTargetRef:
+    name: aegis-rag-monitor
+  minReplicaCount: 1
+  maxReplicaCount: 10
+  triggers:
+    - type: kafka
+      metadata:
+        bootstrapServers: kafka.aegis.svc.cluster.local:9092
+        consumerGroup: aegis-rag-monitor
+        topic: aegis.events.rag
+        lagThreshold: "500"

@@ -1,0 +1,45 @@
+replicaCount: 1
+
+image:
+  repository: aegis-control-plane
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+service:
+  type: ClusterIP
+  port: 8081
+
+env:
+  AEGIS_POLICY_REDIS_ADDR: "redis:6379"
+  AEGIS_BUS_BROKERS: "kafka:9092"
+  AEGIS_OTEL_EXPORTER_ENDPOINT: "otelcol:4317"
+
+# Expected DB connection string injected securely
+dbSecret:
+  name: "aegis-db-secret"
+  key: "dsn"
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+livenessProbe:
+  httpGet:
+    path: /health
+    port: 8081
+
+readinessProbe:
+  httpGet:
+    path: /health
+    port: 8081
+
+serviceAccount:
+  create: true
+  name: "aegis-control-plane"
+
+podAnnotations:
+  spiffe.io/spiffe-id: true

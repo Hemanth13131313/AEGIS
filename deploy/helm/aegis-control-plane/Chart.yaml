@@ -1,0 +1,11 @@
+apiVersion: v2
+name: aegis-control-plane
+description: AEGIS Control Plane - Policy Engine
+version: 0.1.0
+appVersion: 0.1.0
+keywords:
+  - security
+  - ai
+  - control-plane
+maintainers:
+  - name: aegis-security

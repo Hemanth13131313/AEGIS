@@ -1,0 +1,30 @@
+# Optional development tooling — run with:
+# docker compose -f docker-compose.dev.yml -f docker-compose.tools.yml up -d
+
+services:
+  kafka-init:
+    image: confluentinc/cp-kafka:7.6.0
+    depends_on:
+      kafka:
+        condition: service_healthy
+    command: >
+      bash -c "
+        echo 'Creating AEGIS Kafka topics...'
+        kafka-topics --bootstrap-server kafka:29092 --create --if-not-exists --topic aegis.events.raw --partitions 3 --replication-factor 1
+        kafka-topics --bootstrap-server kafka:29092 --create --if-not-exists --topic aegis.events.detections --partitions 3 --replication-factor 1
+        kafka-topics --bootstrap-server kafka:29092 --create --if-not-exists --topic aegis.events.rag --partitions 3 --replication-factor 1
+        kafka-topics --bootstrap-server kafka:29092 --create --if-not-exists --topic aegis.control.policy-reload --partitions 1 --replication-factor 1
+        kafka-topics --bootstrap-server kafka:29092 --create --if-not-exists --topic aegis.redteam.jobs --partitions 1 --replication-factor 1
+        echo 'Topics created.'
+      "
+    restart: "no"
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    ports:
+      - "9080:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: aegis-local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
+    depends_on:
+      - kafka

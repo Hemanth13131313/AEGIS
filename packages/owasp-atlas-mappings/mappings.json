@@ -1,0 +1,34 @@
+{
+  "version": "1.0.0",
+  "owasp_llm_top10": [
+    {"id": "LLM01", "name": "Prompt Injection", "description": "..."},
+    {"id": "LLM02", "name": "Insecure Output Handling", "description": "..."},
+    {"id": "LLM03", "name": "Training Data Poisoning", "description": "..."},
+    {"id": "LLM04", "name": "Model Denial of Service", "description": "..."},
+    {"id": "LLM05", "name": "Supply Chain Vulnerabilities", "description": "..."},
+    {"id": "LLM06", "name": "Sensitive Information Disclosure", "description": "..."},
+    {"id": "LLM07", "name": "Insecure Plugin Design", "description": "..."},
+    {"id": "LLM08", "name": "Excessive Agency", "description": "..."},
+    {"id": "LLM09", "name": "Overreliance", "description": "..."},
+    {"id": "LLM10", "name": "Model Theft", "description": "..."}
+  ],
+  "mitre_atlas_techniques": [
+    {"id": "AML.T0051", "tactic": "Initial Access", "name": "LLM Prompt Injection", "owasp_refs": ["LLM01"]},
+    {"id": "AML.T0054", "tactic": "Exfiltration", "name": "LLM Data Leakage", "owasp_refs": ["LLM06"]},
+    {"id": "AML.T0048", "tactic": "Persistence", "name": "Backdoor ML Model", "owasp_refs": ["LLM03", "LLM05"]},
+    {"id": "AML.T0043", "tactic": "ML Attack Staging", "name": "Craft Adversarial Data", "owasp_refs": ["LLM01", "LLM03"]},
+    {"id": "AML.T0040", "tactic": "Collection", "name": "ML Model Inference API Access", "owasp_refs": ["LLM10"]},
+    {"id": "AML.T0016", "tactic": "ML Attack Staging", "name": "Obtain Capabilities", "owasp_refs": ["LLM05"]},
+    {"id": "AML.T0012", "tactic": "Discovery", "name": "Valid Accounts", "owasp_refs": ["LLM08"]},
+    {"id": "AML.T0025", "tactic": "Defense Evasion", "name": "Evade ML Model", "owasp_refs": ["LLM01"]}
+  ],
+  "detection_to_taxonomy_map": {
+    "prompt_injection": {"owasp": "LLM01", "atlas": "AML.T0051"},
+    "jailbreak": {"owasp": "LLM01", "atlas": "AML.T0051"},
+    "rag_poisoning": {"owasp": "LLM03", "atlas": "AML.T0048"},
+    "data_exfiltration": {"owasp": "LLM06", "atlas": "AML.T0054"},
+    "unsafe_tool_invocation": {"owasp": "LLM08", "atlas": "AML.T0012"},
+    "supply_chain": {"owasp": "LLM05", "atlas": "AML.T0016"},
+    "model_theft": {"owasp": "LLM10", "atlas": "AML.T0040"}
+  }
+}

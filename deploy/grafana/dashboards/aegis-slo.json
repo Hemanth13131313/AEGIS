@@ -1,0 +1,56 @@
+{
+  "uid": "aegis-slo",
+  "title": "AEGIS — SLO Dashboard",
+  "schemaVersion": 36,
+  "panels": [
+    {
+      "id": 1,
+      "type": "timeseries",
+      "title": "Gateway Latency P95 ≤10ms (Burn Rate)",
+      "targets": [{ "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{service=\"aegis-gateway\"}[5m])) by (le))", "refId": "A" }],
+      "datasource": "Prometheus",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 }
+    },
+    {
+      "id": 2,
+      "type": "timeseries",
+      "title": "Scanner Latency P95 ≤500ms (Burn Rate)",
+      "targets": [{ "expr": "histogram_quantile(0.95, sum(rate(aegis_scanner_latency_seconds_bucket[5m])) by (le))", "refId": "A" }],
+      "datasource": "Prometheus",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 }
+    },
+    {
+      "id": 3,
+      "type": "timeseries",
+      "title": "Availability ≥99.9% (Error Budget)",
+      "targets": [{ "expr": "avg_over_time(up{job=~\"aegis.*\"}[30d]) * 100", "refId": "A" }],
+      "datasource": "Prometheus",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 }
+    },
+    {
+      "id": 4,
+      "type": "gauge",
+      "title": "Error Budget Remaining (%)",
+      "targets": [{ "expr": "100 - (sum(rate(http_requests_total{status=~\"5..\"}[30d])) / sum(rate(http_requests_total[30d])) * 100)", "refId": "A" }],
+      "datasource": "Prometheus",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "fieldConfig": { "defaults": { "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": 0 }, { "color": "yellow", "value": 25 }, { "color": "green", "value": 50 }] } } }
+    },
+    {
+      "id": 5,
+      "type": "table",
+      "title": "SLO Compliance Table",
+      "targets": [{ "expr": "sum by(slo) (up)", "refId": "A", "format": "table" }],
+      "datasource": "Prometheus",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 16 }
+    },
+    {
+      "id": 6,
+      "type": "timeseries",
+      "title": "Error Budget Burn Rate",
+      "targets": [{ "expr": "sum(rate(http_requests_total{status=~\"5..\"}[1h])) / sum(rate(http_requests_total[1h]))", "refId": "A" }],
+      "datasource": "Prometheus",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 16 }
+    }
+  ]
+}

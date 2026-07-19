@@ -1,0 +1,42 @@
+{
+  "uid": "aegis-policy",
+  "title": "AEGIS — Policy Engine",
+  "schemaVersion": 36,
+  "panels": [
+    {
+      "id": 1,
+      "type": "timeseries",
+      "title": "Policy check rate",
+      "targets": [{ "expr": "sum(rate(aegis_policy_checks_total[1m]))", "refId": "A" }],
+      "datasource": "Prometheus"
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "Active policies",
+      "targets": [{ "expr": "aegis_policy_active_gauge", "refId": "A" }],
+      "datasource": "Prometheus"
+    },
+    {
+      "id": 3,
+      "type": "timeseries",
+      "title": "Policy hot-reload events",
+      "targets": [{ "expr": "sum(rate(aegis_policy_reloads_total[5m]))", "refId": "A" }],
+      "datasource": "Prometheus"
+    },
+    {
+      "id": 4,
+      "type": "table",
+      "title": "Top blocking policies",
+      "targets": [{ "expr": "topk(10, sum(rate(aegis_policy_checks_total{action=\"deny\"}[5m])) by (policy_ref))", "format": "table", "refId": "A" }],
+      "datasource": "Prometheus"
+    },
+    {
+      "id": 5,
+      "type": "stat",
+      "title": "OPA evaluation latency P95",
+      "targets": [{ "expr": "histogram_quantile(0.95, sum(rate(aegis_opa_eval_duration_seconds_bucket[5m])) by (le)) * 1000", "refId": "A" }],
+      "datasource": "Prometheus"
+    }
+  ]
+}

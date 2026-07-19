@@ -1,0 +1,89 @@
+groups:
+  - name: aegis.slo
+    interval: 30s
+    rules:
+      # Gateway latency SLO breach
+      - alert: GatewayLatencyP95SLOBreach
+        expr: histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{service="aegis-gateway"}[5m])) by (le)) > 0.010
+        for: 2m
+        labels:
+          severity: critical
+          slo: gateway_latency
+        annotations:
+          summary: "Gateway P95 latency exceeds 10ms SLO"
+          description: "P95 latency is {{ $value | humanizeDuration }} (SLO: 10ms)"
+
+      # Scanner latency SLO breach  
+      - alert: ScannerLatencyP95SLOBreach
+        expr: histogram_quantile(0.95, sum(rate(aegis_scanner_latency_seconds_bucket[5m])) by (le)) > 0.500
+        for: 2m
+        labels:
+          severity: warning
+          slo: scanner_latency
+        annotations:
+          summary: "Scanner P95 latency exceeds 500ms SLO"
+          description: "P95 scanner latency is {{ $value | humanizeDuration }}"
+
+      # Availability SLO breach
+      - alert: ServiceDown
+        expr: up{job=~"aegis.*"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          slo: availability
+        annotations:
+          summary: "AEGIS service {{ $labels.job }} is down"
+          description: "{{ $labels.job }} has been down for >1 minute"
+
+  - name: aegis.security
+    rules:
+      # High block rate spike
+      - alert: HighBlockRateSpike
+        expr: sum(rate(aegis_scanner_requests_total{action="block"}[5m])) / sum(rate(aegis_scanner_requests_total[5m])) > 0.20
+        for: 3m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Block rate above 20% — possible attack or misconfigured policy"
+          description: "Current block rate: {{ $value | humanizePercentage }}"
+
+      # High disagreement rate
+      - alert: HighEnsembleDisagreementRate
+        expr: aegis_scanner_disagreement_ratio > 0.15
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Ensemble model disagreement rate above 15%"
+          description: "Models are disagreeing on {{ $value | humanizePercentage }} of requests"
+
+      # Red team regression
+      - alert: RedTeamPassRateBelow90
+        expr: aegis_redteam_pass_rate < 0.90
+        for: 10m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Red team pass rate dropped below 90%"
+          description: "Pass rate: {{ $value | humanizePercentage }} — detection regression likely"
+
+      # Policy engine unavailable
+      - alert: PolicyEngineUnavailable
+        expr: up{job="aegis-policy-engine"} == 0
+        for: 30s
+        labels:
+          severity: critical
+        annotations:
+          summary: "Policy engine is unavailable — gateway may be in fail-open mode"
+
+  - name: aegis.kafka
+    rules:
+      # Consumer lag
+      - alert: KafkaConsumerLagHigh
+        expr: kafka_consumer_lag_sum{topic="aegis.events.raw"} > 10000
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Kafka consumer lag on aegis.events.raw is high"
+          description: "Lag: {{ $value }} messages — scanner may be falling behind"

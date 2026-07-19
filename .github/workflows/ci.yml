@@ -1,0 +1,191 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.22'
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - name: Set up Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+    - name: Run golangci-lint
+      uses: golangci/golangci-lint-action@v3
+      with:
+        working-directory: apps/gateway
+    - name: Run golangci-lint
+      uses: golangci/golangci-lint-action@v3
+      with:
+        working-directory: apps/policy-engine
+    - name: Install ruff
+      run: pip install ruff
+    - name: Run ruff check
+      run: |
+        ruff check apps/scanner
+        ruff check apps/rag-monitor
+        ruff check apps/redteam
+    - name: Run eslint
+      working-directory: apps/ui
+      run: |
+        npm ci
+        npm run lint
+
+  test:
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.22'
+    - name: Go Test
+      run: |
+        cd apps/gateway && go test ./...
+        cd ../policy-engine && go test ./...
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - name: Python Test
+      run: |
+        pip install pytest
+        cd apps/scanner && pytest
+        cd ../rag-monitor && pytest
+        cd ../redteam && pytest
+    - name: Install OPA
+      run: |
+        curl -L -o opa https://openpolicyagent.org/downloads/v0.61.0/opa_linux_amd64_static
+        chmod 755 ./opa
+        sudo mv opa /usr/local/bin/
+    - name: Run OPA tests
+      run: opa test apps/policy-engine/rego/
+    - name: Set up Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+    - name: TS Test
+      working-directory: apps/ui
+      run: |
+        npm ci
+        npm test
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Build Images
+      run: |
+        docker build -t aegis-gateway:${{ github.sha }} apps/gateway
+        docker build -t aegis-scanner:${{ github.sha }} apps/scanner
+        docker build -t aegis-rag-monitor:${{ github.sha }} apps/rag-monitor
+        docker build -t aegis-policy-engine:${{ github.sha }} apps/policy-engine
+        docker build -t aegis-redteam:${{ github.sha }} apps/redteam
+    - name: Save images as tar
+      run: |
+        docker save aegis-gateway:${{ github.sha }} -o aegis-gateway.tar
+        docker save aegis-scanner:${{ github.sha }} -o aegis-scanner.tar
+        docker save aegis-rag-monitor:${{ github.sha }} -o aegis-rag-monitor.tar
+        docker save aegis-policy-engine:${{ github.sha }} -o aegis-policy-engine.tar
+        docker save aegis-redteam:${{ github.sha }} -o aegis-redteam.tar
+    - name: Upload image artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: docker-images
+        path: |
+          aegis-gateway.tar
+          aegis-scanner.tar
+          aegis-rag-monitor.tar
+          aegis-policy-engine.tar
+          aegis-redteam.tar
+
+  sbom:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/download-artifact@v4
+      with:
+        name: docker-images
+    - name: Load images
+      run: |
+        docker load -i aegis-gateway.tar
+        docker load -i aegis-scanner.tar
+        docker load -i aegis-rag-monitor.tar
+        docker load -i aegis-policy-engine.tar
+        docker load -i aegis-redteam.tar
+    - name: Install Syft
+      run: curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin
+    - name: Generate SBOMs
+      run: |
+        syft packages docker:aegis-gateway:${{ github.sha }} -o cyclonedx-json > aegis-gateway-sbom.json
+        syft packages docker:aegis-scanner:${{ github.sha }} -o cyclonedx-json > aegis-scanner-sbom.json
+        syft packages docker:aegis-rag-monitor:${{ github.sha }} -o cyclonedx-json > aegis-rag-monitor-sbom.json
+        syft packages docker:aegis-policy-engine:${{ github.sha }} -o cyclonedx-json > aegis-policy-engine-sbom.json
+        syft packages docker:aegis-redteam:${{ github.sha }} -o cyclonedx-json > aegis-redteam-sbom.json
+    - name: Upload SBOMs
+      uses: actions/upload-artifact@v4
+      with:
+        name: sboms
+        path: '*-sbom.json'
+
+  scan:
+    needs: sbom
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/download-artifact@v4
+      with:
+        name: docker-images
+    - name: Load images
+      run: |
+        docker load -i aegis-gateway.tar
+        docker load -i aegis-scanner.tar
+        docker load -i aegis-rag-monitor.tar
+        docker load -i aegis-policy-engine.tar
+        docker load -i aegis-redteam.tar
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: 'aegis-gateway:${{ github.sha }}'
+        format: 'table'
+        exit-code: '1'
+        ignore-unfixed: true
+        vuln-type: 'os,library'
+        severity: 'CRITICAL,HIGH'
+
+  sign:
+    needs: scan
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+    steps:
+    - name: Install Cosign
+      uses: sigstore/cosign-installer@v3.5.0
+    - uses: actions/download-artifact@v4
+      with:
+        name: docker-images
+    - uses: actions/download-artifact@v4
+      with:
+        name: sboms
+    - name: Load images
+      run: docker load -i aegis-gateway.tar
+    - name: Sign and Attest
+      run: |
+        echo "Requires push to registry first, omitted for brevity."

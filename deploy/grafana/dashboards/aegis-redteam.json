@@ -1,0 +1,42 @@
+{
+  "uid": "aegis-redteam",
+  "title": "AEGIS — Red Team Coverage",
+  "schemaVersion": 36,
+  "panels": [
+    {
+      "id": 1,
+      "type": "stat",
+      "title": "Last Run Pass Rate",
+      "targets": [{ "expr": "aegis_redteam_pass_rate", "refId": "A" }],
+      "datasource": "Prometheus"
+    },
+    {
+      "id": 2,
+      "type": "table",
+      "title": "Results by OWASP category",
+      "targets": [{ "expr": "sum(aegis_redteam_results) by (owasp_category, status)", "format": "table", "refId": "A" }],
+      "datasource": "Prometheus"
+    },
+    {
+      "id": 3,
+      "type": "barchart",
+      "title": "ATLAS Technique Coverage",
+      "targets": [{ "expr": "aegis_redteam_atlas_coverage", "refId": "A" }],
+      "datasource": "Prometheus"
+    },
+    {
+      "id": 4,
+      "type": "timeseries",
+      "title": "Pass rate trend",
+      "targets": [{ "expr": "aegis_redteam_pass_rate", "refId": "A" }],
+      "datasource": "Prometheus"
+    },
+    {
+      "id": 5,
+      "type": "stat",
+      "title": "Cases with disagreement",
+      "targets": [{ "expr": "sum(aegis_redteam_disagreements)", "refId": "A" }],
+      "datasource": "Prometheus"
+    }
+  ]
+}

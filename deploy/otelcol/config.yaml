@@ -1,0 +1,64 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+processors:
+  batch:
+    timeout: 5s
+    send_batch_size: 512
+  memory_limiter:
+    check_interval: 5s
+    limit_mib: 256
+    spike_limit_mib: 64
+  resource:
+    attributes:
+      - key: service.environment
+        value: development
+        action: insert
+  # Tail sampling: sample 100% of error traces, 10% of success
+  tail_sampling:
+    decision_wait: 10s
+    policies:
+      - name: errors
+        type: status_code
+        status_code: {status_codes: [ERROR]}
+      - name: slow-traces
+        type: latency
+        latency: {threshold_ms: 50}
+      - name: sample-rest
+        type: probabilistic
+        probabilistic: {sampling_percentage: 10}
+
+exporters:
+  prometheus:
+    endpoint: 0.0.0.0:8889
+    namespace: aegis
+  logging:
+    verbosity: normal
+    sampling_initial: 5
+    sampling_thereafter: 200
+  # Placeholder for production Jaeger/Tempo
+  otlp/backend:
+    endpoint: "${env:OTEL_EXPORTER_OTLP_ENDPOINT:-localhost:4317}"
+    tls:
+      insecure: true
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [memory_limiter, batch, resource, tail_sampling]
+      exporters: [logging, otlp/backend]
+    metrics:
+      receivers: [otlp]
+      processors: [memory_limiter, batch, resource]
+      exporters: [prometheus]
+  telemetry:
+    logs:
+      level: warn
+    metrics:
+      address: 0.0.0.0:8888

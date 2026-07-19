@@ -1,0 +1,97 @@
+syntax = "proto3";
+package aegis.v1;
+option go_package = "github.com/aegis-security/aegis/packages/proto/aegis/v1";
+
+// PolicyRequest represents a request to evaluate a policy against an input payload.
+message PolicyRequest {
+  string session_id = 1;
+  string org_id = 2;
+  string app_id = 3;
+  string model_id = 4;
+  string environment = 5;
+  bytes input_payload = 6;
+  map<string, string> metadata = 7;
+}
+
+// PolicyVerdict represents the outcome of a policy evaluation.
+message PolicyVerdict {
+  string action = 1; // allow, block, redact, tag
+  string policy_ref = 2;
+  string reason = 3;
+  string request_id = 4;
+  float confidence = 5;
+}
+
+// ScanRequest represents a request to perform deep scanning on an input payload.
+message ScanRequest {
+  string session_id = 1;
+  string request_id = 2;
+  bytes payload = 3;
+  string modality = 4; // default: "text"
+  map<string, string> context = 5;
+}
+
+// ScanVerdict represents the outcome of a scan.
+message ScanVerdict {
+  string session_id = 1;
+  string request_id = 2;
+  string action = 3;
+  float confidence = 4;
+  string owasp_category = 5;
+  string atlas_technique = 6;
+  string reason = 7;
+  bool disagreement = 8;
+}
+
+// RetrievalEvent represents context chunks retrieved for generation.
+message RetrievalEvent {
+  string session_id = 1;
+  string request_id = 2;
+  repeated bytes chunk_embeddings = 3;
+  repeated string chunks = 4;
+  repeated float scores = 5;
+}
+
+// RAGVerdict represents the outcome of a RAG evaluation.
+message RAGVerdict {
+  string session_id = 1;
+  float anomaly_score = 2;
+  bool is_anomalous = 3;
+  string reason = 4;
+  string owasp_category = 5;
+  string atlas_technique = 6;
+}
+
+// DetectionEvent represents an actual detection or incident.
+message DetectionEvent {
+  string id = 1;
+  string session_id = 2;
+  string event_id = 3;
+  string category = 4;
+  float confidence = 5;
+  string action_taken = 6;
+  string owasp_llm_id = 7;
+  string atlas_technique = 8;
+  int64 timestamp_ms = 9;
+}
+
+// HealthRequest represents a service health check request.
+message HealthRequest {}
+
+// HealthResponse represents a service health check response.
+message HealthResponse {
+  string status = 1;
+  string service = 2;
+}
+
+// PolicyService exposes synchronous enforcement actions.
+service PolicyService {
+  rpc Check(PolicyRequest) returns (PolicyVerdict);
+  rpc Health(HealthRequest) returns (HealthResponse);
+}
+
+// ScannerService exposes deep scanning evaluation operations.
+service ScannerService {
+  rpc Scan(ScanRequest) returns (ScanVerdict);
+  rpc Health(HealthRequest) returns (HealthResponse);
+}

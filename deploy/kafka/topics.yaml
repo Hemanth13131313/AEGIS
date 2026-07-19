@@ -1,0 +1,44 @@
+# AEGIS Kafka Topic Definitions
+# Applied via kafka-topics.sh or Confluent Admin API
+# Retention and partitioning sized for ~10k events/sec
+
+topics:
+  - name: aegis.events.raw
+    partitions: 12
+    replication_factor: 3
+    config:
+      retention.ms: "604800000"  # 7 days
+      cleanup.policy: delete
+      compression.type: lz4
+      max.message.bytes: "2097152"  # 2MB
+      # Producer key: session_id (ensures session ordering per partition)
+
+  - name: aegis.events.detections
+    partitions: 12
+    replication_factor: 3
+    config:
+      retention.ms: "2592000000"  # 30 days
+      cleanup.policy: delete
+      compression.type: lz4
+
+  - name: aegis.events.rag
+    partitions: 6
+    replication_factor: 3
+    config:
+      retention.ms: "604800000"
+      cleanup.policy: delete
+      compression.type: lz4
+
+  - name: aegis.control.policy-reload
+    partitions: 1
+    replication_factor: 3
+    config:
+      retention.ms: "86400000"  # 1 day
+      cleanup.policy: delete
+
+  - name: aegis.redteam.jobs
+    partitions: 3
+    replication_factor: 3
+    config:
+      retention.ms: "86400000"
+      cleanup.policy: delete

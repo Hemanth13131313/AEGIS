@@ -1,0 +1,33 @@
+name: Cross-Cloud Smoke Tests
+
+on:
+  workflow_dispatch:
+    inputs:
+      cloud:
+        type: choice
+        description: 'Target cloud'
+        options: [aws, gcp, azure]
+        default: aws
+      environment:
+        type: string
+        default: staging
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Configure cloud credentials
+      # Uses OIDC for each cloud
+      run: echo "Configure ${{ inputs.cloud }} credentials"
+    - name: Get kubeconfig
+      run: |
+        case "${{ inputs.cloud }}" in
+          aws) aws eks update-kubeconfig --name aegis-cluster --region us-east-1 ;;
+          gcp) gcloud container clusters get-credentials aegis-cluster --region us-central1 ;;
+          azure) az aks get-credentials --resource-group aegis-rg --name aegis-cluster ;;
+        esac
+    - name: Run smoke tests
+      env:
+        AEGIS_GATEWAY_URL: ${{ vars.AEGIS_GATEWAY_URL }}
+      run: bash tests/smoke/smoke_test.sh

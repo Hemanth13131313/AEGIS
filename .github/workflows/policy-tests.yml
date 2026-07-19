@@ -1,0 +1,28 @@
+name: OPA Policy Tests
+
+on:
+  push:
+    paths:
+      - 'infra/policies/**'
+      - 'apps/policy-engine/rego/**'
+  pull_request:
+    paths:
+      - 'infra/policies/**'
+      - 'apps/policy-engine/rego/**'
+
+jobs:
+  test-policies:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install OPA
+        uses: open-policy-agent/setup-opa@v2
+        with:
+          version: '0.65.0'
+
+      - name: Run OPA Tests for Infra Policies
+        run: opa test infra/policies/ -v
+
+      - name: Run OPA Tests for Policy Engine Rego
+        run: opa test apps/policy-engine/rego/ -v

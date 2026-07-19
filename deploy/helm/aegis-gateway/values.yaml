@@ -1,0 +1,54 @@
+replicaCount: 2
+
+image:
+  repository: ghcr.io/aegis-security/aegis-gateway
+  pullPolicy: IfNotPresent
+  tag: ""
+
+service:
+  type: ClusterIP
+  port: 8080
+  metricsPort: 8080
+
+resources:
+  limits:
+    cpu: 200m
+    memory: 256Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 60
+
+env:
+  AEGIS_GATEWAY_LISTEN_ADDR: ":8080"
+  AEGIS_GATEWAY_FAIL_MODE: "closed"
+  AEGIS_GATEWAY_AUTH_SKIP_VERIFY: "false"
+
+serviceMonitor:
+  enabled: true  # for Prometheus Operator
+  interval: 15s
+  path: /metrics
+
+podAnnotations:
+  prometheus.io/scrape: "true"
+  prometheus.io/port: "8080"
+  prometheus.io/path: "/metrics"
+
+livenessProbe:
+  httpGet:
+    path: /health
+    port: 8080
+  initialDelaySeconds: 5
+  periodSeconds: 10
+
+readinessProbe:
+  httpGet:
+    path: /health
+    port: 8080
+  initialDelaySeconds: 3
+  periodSeconds: 5

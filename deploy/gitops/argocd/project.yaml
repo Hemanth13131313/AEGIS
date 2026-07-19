@@ -1,0 +1,24 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: aegis
+  namespace: argocd
+spec:
+  description: AEGIS AI Security Platform
+  sourceRepos:
+    - https://github.com/aegis-security/aegis
+  destinations:
+    - namespace: aegis
+      server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+    - group: ''
+      kind: Namespace
+  namespaceResourceWhitelist:
+    - group: '*'
+      kind: '*'
+  roles:
+    - name: deploy-robot
+      description: Automated deployment role
+      policies:
+        - p, proj:aegis:deploy-robot, applications, sync, aegis/*, allow
+      jwtTokens: []

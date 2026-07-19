@@ -1,0 +1,7 @@
+* @aegis-security/core-team
+apps/gateway/ @aegis-security/platform
+apps/scanner/ @aegis-security/ml-security
+apps/policy-engine/ @aegis-security/platform
+apps/ui/ @aegis-security/frontend
+deploy/ @aegis-security/platform
+infra/ @aegis-security/platform

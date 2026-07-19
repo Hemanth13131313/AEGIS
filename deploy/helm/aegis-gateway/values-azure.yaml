@@ -1,0 +1,11 @@
+# Azure-specific overrides
+image:
+  repository: aegisacr.azurecr.io/aegis-gateway
+
+serviceAccount:
+  annotations:
+    azure.workload.identity/client-id: REPLACE_WITH_MANAGED_IDENTITY_CLIENT_ID
+
+env:
+  AEGIS_VAULT_ADDR: "https://aegis-kv.vault.azure.net"
+  AEGIS_KAFKA_BROKERS: "REPLACE_WITH_EVENTHUB_KAFKA_ENDPOINT"

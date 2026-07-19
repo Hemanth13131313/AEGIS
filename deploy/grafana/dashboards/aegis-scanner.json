@@ -1,0 +1,59 @@
+{
+  "uid": "aegis-scanner",
+  "title": "AEGIS — Scanner Performance",
+  "schemaVersion": 36,
+  "panels": [
+    {
+      "id": 1,
+      "type": "timeseries",
+      "title": "Pre-filter vs Ensemble hit rate",
+      "targets": [
+        { "expr": "sum(rate(aegis_scanner_requests_total{pre_filter_triggered=\"true\"}[5m]))", "legendFormat": "Pre-filter", "refId": "A" },
+        { "expr": "sum(rate(aegis_scanner_requests_total{pre_filter_triggered=\"false\"}[5m]))", "legendFormat": "Ensemble", "refId": "B" }
+      ],
+      "datasource": "Prometheus"
+    },
+    {
+      "id": 2,
+      "type": "heatmap",
+      "title": "Total scan latency distribution",
+      "targets": [{ "expr": "sum(rate(aegis_scanner_latency_seconds_bucket[5m])) by (le)", "format": "heatmap", "refId": "A" }],
+      "datasource": "Prometheus"
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "Model A avg latency",
+      "targets": [{ "expr": "histogram_quantile(0.95, sum(rate(aegis_scanner_latency_seconds_bucket{stage=\"model_a\"}[5m])) by (le))", "refId": "A" }],
+      "datasource": "Prometheus"
+    },
+    {
+      "id": 4,
+      "type": "stat",
+      "title": "Model B avg latency",
+      "targets": [{ "expr": "histogram_quantile(0.95, sum(rate(aegis_scanner_latency_seconds_bucket{stage=\"model_b\"}[5m])) by (le))", "refId": "A" }],
+      "datasource": "Prometheus"
+    },
+    {
+      "id": 5,
+      "type": "timeseries",
+      "title": "Disagreement rate",
+      "targets": [{ "expr": "rate(aegis_scanner_disagreement_ratio[5m])", "refId": "A" }],
+      "datasource": "Prometheus"
+    },
+    {
+      "id": 6,
+      "type": "piechart",
+      "title": "Actions by OWASP category",
+      "targets": [{ "expr": "sum(rate(aegis_scanner_requests_total[5m])) by (owasp)", "refId": "A" }],
+      "datasource": "Prometheus"
+    },
+    {
+      "id": 7,
+      "type": "stat",
+      "title": "Pre-filter catch rate %",
+      "targets": [{ "expr": "sum(rate(aegis_scanner_requests_total{action=\"block\", pre_filter_triggered=\"true\"}[5m])) / sum(rate(aegis_scanner_requests_total{action=\"block\"}[5m])) * 100", "refId": "A" }],
+      "datasource": "Prometheus"
+    }
+  ]
+}

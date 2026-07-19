@@ -1,0 +1,39 @@
+name: Red Team
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '0 */6 * * *'  # every 6 hours
+  workflow_dispatch:
+    inputs:
+      target_url:
+        description: 'AEGIS target URL'
+        default: 'http://localhost:8080'
+
+jobs:
+  redteam:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - name: Install uv
+      run: pip install uv
+    - name: Install deps
+      run: uv sync
+      working-directory: apps/redteam
+    - name: Validate test cases
+      run: uv run python cli.py validate --cases testcases/registry.json
+      working-directory: apps/redteam
+    - name: Run red team (dry-run in CI without live target)
+      run: uv run python cli.py run --dry-run --target http://placeholder --output ci
+      working-directory: apps/redteam
+    - name: Upload results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: redteam-results
+        path: apps/redteam/results/

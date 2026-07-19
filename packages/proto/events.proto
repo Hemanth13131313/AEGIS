@@ -1,0 +1,78 @@
+syntax = "proto3";
+package aegis.events.v1;
+option go_package = "github.com/aegis-security/aegis/packages/proto/events/v1";
+
+import "google/protobuf/timestamp.proto";
+
+// RawEvent is published to aegis.events.raw by the Gateway on every request.
+message RawEvent {
+  string id = 1;                          // UUID v4
+  string session_id = 2;                  // Kafka partition key
+  string request_id = 3;
+  string org_id = 4;
+  string app_id = 5;
+  string model_id = 6;
+  string environment = 7;
+  EventType event_type = 8;
+  Modality modality = 9;
+  bytes payload_hash = 10;                // SHA-256 of raw payload (not the payload itself)
+  int32 token_count_estimate = 11;
+  string policy_verdict = 12;             // allow, block, redact, tag
+  string policy_ref = 13;
+  map<string, string> metadata = 14;
+  google.protobuf.Timestamp ts = 15;
+}
+
+enum EventType {
+  EVENT_TYPE_UNSPECIFIED = 0;
+  EVENT_TYPE_REQUEST = 1;
+  EVENT_TYPE_RESPONSE = 2;
+  EVENT_TYPE_TOOL_CALL = 3;
+  EVENT_TYPE_TOOL_RESPONSE = 4;
+  EVENT_TYPE_ERROR = 5;
+}
+
+enum Modality {
+  MODALITY_UNSPECIFIED = 0;
+  MODALITY_TEXT = 1;
+  MODALITY_IMAGE = 2;    // future
+  MODALITY_AUDIO = 3;    // future
+  MODALITY_EMBEDDING = 4; // used for RAG events
+}
+
+// DetectionEvent is published to aegis.events.detections by Scanner or RAG Monitor.
+message DetectionEvent {
+  string id = 1;
+  string event_id = 2;       // references RawEvent.id
+  string session_id = 3;
+  string category = 4;       // prompt_injection, jailbreak, rag_poisoning, etc.
+  float confidence = 5;
+  string action_taken = 6;   // allow, block, redact, tag
+  string owasp_llm_id = 7;   // LLM01..LLM10
+  string atlas_technique = 8; // AML.T0051 etc.
+  string policy_ref = 9;
+  string model_a_verdict = 10;
+  string model_b_verdict = 11;
+  bool disagreement = 12;
+  google.protobuf.Timestamp ts = 13;
+}
+
+// RAGEvent is published to aegis.events.rag for anomaly analysis.
+message RAGEvent {
+  string id = 1;
+  string session_id = 2;
+  string request_id = 3;
+  repeated bytes chunk_embeddings = 4; // flattened float32 arrays (little-endian)
+  repeated string chunks = 5;
+  repeated float scores = 6;
+  google.protobuf.Timestamp ts = 7;
+}
+
+// PolicyReloadCommand is published to aegis.control.policy-reload.
+message PolicyReloadCommand {
+  string policy_id = 1;
+  string scope_id = 2;
+  string scope_type = 3;
+  string triggered_by = 4; // user, system
+  google.protobuf.Timestamp ts = 5;
+}

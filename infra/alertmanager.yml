@@ -1,0 +1,26 @@
+global:
+  resolve_timeout: 5m
+
+route:
+  group_by: ['alertname', 'severity']
+  group_wait: 10s
+  group_interval: 5m
+  repeat_interval: 12h
+  receiver: 'dev-log'
+  routes:
+    - match:
+        severity: critical
+      receiver: 'dev-log'
+      group_wait: 0s
+
+receivers:
+  - name: 'dev-log'
+    # Dev: log to console only. Production: configure PagerDuty/Slack/email here.
+    # See https://prometheus.io/docs/alerting/latest/configuration/
+
+inhibit_rules:
+  - source_match:
+      severity: critical
+    target_match:
+      severity: warning
+    equal: ['alertname']

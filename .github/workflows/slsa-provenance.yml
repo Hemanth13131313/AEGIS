@@ -1,0 +1,41 @@
+name: SLSA Provenance
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      hashes: ${{ steps.hash.outputs.hashes }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Build and compute hashes
+        id: hash
+        run: |
+          # Dummy build step for SLSA provenance demo
+          # In reality, this would build the 4 images and push them to GHCR, extracting their SHAs
+          echo "Building images..."
+          # Mock sha256 outputs
+          echo "hashes=$(echo -n 'ghcr.io/aegis-security/aegis-gateway:latest@sha256:dummyhash123' | base64 -w0)" >> $GITHUB_OUTPUT
+
+  provenance:
+    needs: [build]
+    permissions:
+      actions: read
+      id-token: write
+      contents: write
+    uses: slsa-framework/slsa-github-generator/.github/workflows/generator_generic_slsa3.yml@v2.0.0
+    with:
+      base64-subjects: "${{ needs.build.outputs.hashes }}"
+
+  verify:
+    needs: [provenance]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify SLSA Provenance
+        run: |
+          echo "Verifying provenance using slsa-verifier..."
+          # slsa-verifier verify-artifact ...

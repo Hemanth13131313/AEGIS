@@ -1,0 +1,60 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: aegis-local
+    environment: development
+
+rule_files:
+  - "/etc/prometheus/rules/*.yml"
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: []
+      # Alertmanager not configured for dev — see infra/alertmanager.yml for prod
+
+scrape_configs:
+  - job_name: aegis-gateway
+    static_configs:
+      - targets: ['gateway:8080']
+    metrics_path: /metrics
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: service
+        replacement: aegis-gateway
+
+  - job_name: aegis-scanner
+    static_configs:
+      - targets: ['scanner:8000']
+    metrics_path: /metrics
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: service
+        replacement: aegis-scanner
+
+  - job_name: aegis-rag-monitor
+    static_configs:
+      - targets: ['rag-monitor:8001']
+    metrics_path: /metrics
+
+  - job_name: aegis-policy-engine
+    static_configs:
+      - targets: ['policy-engine:8081']
+    metrics_path: /metrics
+
+  - job_name: otelcol
+    static_configs:
+      - targets: ['otelcol:8888']
+
+  - job_name: kafka-exporter
+    static_configs:
+      - targets: ['kafka-exporter:9308']
+
+  - job_name: clickhouse
+    static_configs:
+      - targets: ['clickhouse:9363']
+
+  - job_name: prometheus
+    static_configs:
+      - targets: ['localhost:9090']

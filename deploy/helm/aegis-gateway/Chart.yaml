@@ -1,0 +1,12 @@
+apiVersion: v2
+name: aegis-gateway
+description: AEGIS Gateway Sidecar — data plane enforcement proxy
+version: 0.1.0
+appVersion: 0.1.0
+keywords:
+  - security
+  - ai
+  - gateway
+  - proxy
+maintainers:
+  - name: aegis-security

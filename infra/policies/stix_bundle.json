@@ -1,0 +1,24 @@
+{
+  "type": "bundle",
+  "id": "bundle--PLACEHOLDER",
+  "objects": [
+    {
+      "type": "identity",
+      "spec_version": "2.1",
+      "id": "identity--aegis",
+      "name": "AEGIS Security Platform",
+      "identity_class": "system"
+    },
+    {
+      "type": "attack-pattern",
+      "spec_version": "2.1",
+      "id": "attack-pattern--PLACEHOLDER",
+      "name": "Prompt Injection",
+      "description": "OWASP LLM01 / MITRE ATLAS AML.T0051",
+      "external_references": [
+        {"source_name": "OWASP", "external_id": "LLM01"},
+        {"source_name": "MITRE ATLAS", "external_id": "AML.T0051"}
+      ]
+    }
+  ]
+}

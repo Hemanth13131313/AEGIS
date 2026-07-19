@@ -1,0 +1,11 @@
+# GCP-specific overrides
+image:
+  repository: us-central1-docker.pkg.dev/PROJECT_ID/aegis/aegis-gateway
+
+serviceAccount:
+  annotations:
+    iam.gke.io/gcp-service-account: aegis-gateway@PROJECT_ID.iam.gserviceaccount.com
+
+env:
+  AEGIS_VAULT_ADDR: "https://vault.aegis.internal"
+  AEGIS_KAFKA_BROKERS: "REPLACE_WITH_PUBSUB_KAFKA_ENDPOINT"
