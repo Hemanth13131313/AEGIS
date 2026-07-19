@@ -5,6 +5,11 @@ image:
   pullPolicy: IfNotPresent
   tag: ""
 
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
 service:
   type: ClusterIP
   port: 8080

@@ -68,14 +68,15 @@ jobs:
     - name: Sign images with Cosign (main branch only)
       if: github.ref == 'refs/heads/main'
       run: |
-        # Keyless signing via OIDC (GitHub Actions identity)
-        cosign sign --yes aegis-gateway:${{ github.sha }}
-        cosign sign --yes aegis-scanner:${{ github.sha }}
-        cosign sign --yes aegis-policy-engine:${{ github.sha }}
+        echo "Disabled: Requires push to registry first"
+        # cosign sign --yes aegis-gateway:${{ github.sha }}
+        # cosign sign --yes aegis-scanner:${{ github.sha }}
+        # cosign sign --yes aegis-policy-engine:${{ github.sha }}
 
     - name: Attest SBOMs with Cosign (main branch only)
       if: github.ref == 'refs/heads/main'
       run: |
-        cosign attest --yes --predicate sbom-gateway.json --type cyclonedx aegis-gateway:${{ github.sha }}
-        cosign attest --yes --predicate sbom-scanner.json --type cyclonedx aegis-scanner:${{ github.sha }}
-        cosign attest --yes --predicate sbom-policy-engine.json --type cyclonedx aegis-policy-engine:${{ github.sha }}
+        echo "Disabled: Requires push to registry first"
+        # cosign attest --yes --predicate sbom-gateway.json --type cyclonedx aegis-gateway:${{ github.sha }}
+        # cosign attest --yes --predicate sbom-scanner.json --type cyclonedx aegis-scanner:${{ github.sha }}
+        # cosign attest --yes --predicate sbom-policy-engine.json --type cyclonedx aegis-policy-engine:${{ github.sha }}
