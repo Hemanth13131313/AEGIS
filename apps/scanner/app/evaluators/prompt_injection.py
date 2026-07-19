@@ -4,7 +4,6 @@ Runs BEFORE LLM ensemble to catch obvious patterns instantly (<1ms).
 Reduces LLM calls for clear-cut cases.
 """
 from dataclasses import dataclass
-from typing import Optional
 import re
 import structlog
 

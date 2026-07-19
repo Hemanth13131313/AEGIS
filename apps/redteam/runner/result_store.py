@@ -2,11 +2,9 @@
 Persists red team run results to JSON and ClickHouse.
 """
 import json
-import os
-from datetime import datetime, timezone
+from datetime import datetime
 from pathlib import Path
 from typing import Optional
-import httpx
 import structlog
 from dataclasses import asdict
 

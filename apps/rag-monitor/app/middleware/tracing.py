@@ -2,11 +2,12 @@
 Request tracing middleware for AEGIS RAG Monitor.
 Propagates X-Request-ID and X-B3-TraceId headers.
 """
+import uuid
+
+import structlog
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 from starlette.responses import Response
-import uuid
-import structlog
 
 logger = structlog.get_logger(__name__)
 

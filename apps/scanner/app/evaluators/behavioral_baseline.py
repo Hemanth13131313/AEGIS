@@ -12,7 +12,6 @@ Tracked features per (org_id, app_id) baseline:
 """
 from dataclasses import dataclass, field
 from collections import deque
-from typing import Optional
 import math
 import structlog
 

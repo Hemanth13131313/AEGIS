@@ -17,7 +17,7 @@ from typing import Optional
 import structlog
 
 from app.models.llm_client import LLMClassifierClient, LLMClientConfig, ClassificationResult
-from app.models.schemas import VerdictAction, OWASPCategory
+from app.models.schemas import VerdictAction
 
 logger = structlog.get_logger(__name__)
 

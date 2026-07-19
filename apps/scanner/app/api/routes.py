@@ -1,10 +1,7 @@
-from fastapi import APIRouter, HTTPException, Depends, Request
+from fastapi import APIRouter, Request
 import asyncio
 import time
 from app.models.schemas import ScanRequest, ScanVerdict, VerdictAction
-from app.evaluators.prompt_injection import PromptInjectionEvaluator
-from app.evaluators.jailbreak import JailbreakEvaluator
-from app.evaluators.data_exfiltration import DataExfiltrationEvaluator
 from app.ensemble.scanner import EnsembleScanner
 import structlog
 

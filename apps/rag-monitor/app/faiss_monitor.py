@@ -10,8 +10,6 @@ On each retrieval event:
 
 FAISS not imported at module level — optional dep. Graceful fallback to Phase 4 statistical detector.
 """
-from dataclasses import dataclass
-from typing import Optional
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -24,7 +22,8 @@ except ImportError:
     FAISS_AVAILABLE = False
     logger.warning("FAISS not available — falling back to statistical RAG monitor")
 
-from app.monitor import RAGMonitor, RetrievalEvent, RAGVerdict
+from app.monitor import RAGMonitor, RAGVerdict, RetrievalEvent
+
 
 class FAISSRAGMonitor:
     """

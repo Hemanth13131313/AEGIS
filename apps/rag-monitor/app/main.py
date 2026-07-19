@@ -1,20 +1,18 @@
 """
 AEGIS RAG Monitor — FastAPI entry point.
 """
-from contextlib import asynccontextmanager
-from typing import AsyncGenerator
-import asyncio
 import os
 import uuid
+from collections.abc import AsyncGenerator
+from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
 import structlog
+from fastapi import FastAPI, Request
 
 from app.api.routes import router
-from app.monitor.rag_monitor import RAGMonitor
-from app.consumer.kafka_consumer import RAGKafkaConsumer, KafkaConsumerConfig
 from app.consumer.detection_producer import DetectionProducer
+from app.consumer.kafka_consumer import KafkaConsumerConfig, RAGKafkaConsumer
+from app.monitor.rag_monitor import RAGMonitor
 
 logger = structlog.get_logger(__name__)
 

@@ -23,6 +23,10 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: '20'
+    - name: Generate go.sum
+      run: |
+        cd apps/gateway && go mod tidy
+        cd ../policy-engine && go mod tidy
     - name: Run golangci-lint
       uses: golangci/golangci-lint-action@v3
       with:

@@ -2,7 +2,7 @@ import pytest
 import json
 from unittest.mock import AsyncMock, patch
 import httpx
-from app.models.llm_client import LLMClassifierClient, LLMClientConfig, ClassificationResult
+from app.models.llm_client import LLMClassifierClient, LLMClientConfig
 
 @pytest.fixture
 def config():

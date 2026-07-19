@@ -1,7 +1,8 @@
 import json
-from dataclasses import dataclass, asdict
-from confluent_kafka import Producer
+from dataclasses import asdict, dataclass
+
 import structlog
+from confluent_kafka import Producer
 
 logger = structlog.get_logger(__name__)
 

@@ -13,7 +13,6 @@ import click
 from rich.console import Console
 from rich.table import Table
 from rich.progress import Progress, SpinnerColumn, TimeElapsedColumn
-from rich import print as rprint
 import jsonschema
 
 from generators.base import TestCase
@@ -22,7 +21,7 @@ from generators.jailbreak import JailbreakGenerator
 from generators.data_exfiltration import DataExfiltrationGenerator
 from generators.excessive_agency import ExcessiveAgencyGenerator
 from generators.benign import BenignGenerator
-from runner import RedTeamRunner, RunConfig, RunResult
+from runner import RedTeamRunner, RunConfig
 from runner.result_store import ResultStore
 
 console = Console()
@@ -134,7 +133,7 @@ def run(target, api_key, cases, owasp, concurrency, timeout, dry_run, fail_on_di
             
         console.print(table)
         
-        console.print(f"\n[bold]Summary[/bold]")
+        console.print("\n[bold]Summary[/bold]")
         console.print(f"Total: {summary.total} | Passed: {summary.passed} | Failed: {summary.failed} | Disagreements: {summary.disagreements}")
         color = "green" if summary.pass_rate >= 0.9 else "yellow" if summary.pass_rate >= 0.7 else "red"
         console.print(f"Pass Rate: [{color}]{summary.pass_rate*100:.1f}%[/{color}]")

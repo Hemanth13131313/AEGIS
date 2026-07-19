@@ -6,13 +6,13 @@ import asyncio
 import json
 import uuid
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
-from confluent_kafka import Consumer, KafkaError
 import structlog
+from confluent_kafka import Consumer, KafkaError
 
+from app.consumer.detection_producer import DetectionEventMessage, DetectionProducer
 from app.monitor.rag_monitor import RAGMonitor
-from app.consumer.detection_producer import DetectionProducer, DetectionEventMessage
 
 logger = structlog.get_logger(__name__)
 
@@ -122,7 +122,7 @@ class RAGKafkaConsumer:
                 model_a_verdict="anomaly",
                 model_b_verdict="none",
                 disagreement=False,
-                ts=datetime.now(timezone.utc).isoformat()
+                ts=datetime.now(UTC).isoformat()
             )
             self.producer.produce(detection)
             logger.info("rag_anomaly_detected", session_id=event.session_id)

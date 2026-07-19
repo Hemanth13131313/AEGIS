@@ -4,11 +4,9 @@ Uses OpenAI-compatible API (vLLM, local models, or cloud).
 Meta-injection prevention: system prompt and user payload are NEVER concatenated.
 All inputs pass through the structural isolation wrapper before being sent.
 """
-import asyncio
 import json
 import time
 from dataclasses import dataclass
-from typing import Optional
 import httpx
 import structlog
 

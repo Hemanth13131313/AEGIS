@@ -1,6 +1,8 @@
+
 import pytest
-import asyncio
-from app.monitor import RAGMonitor, RetrievalEvent, RAGVerdict
+
+from app.monitor import RAGMonitor, RetrievalEvent
+
 
 @pytest.fixture
 def monitor():

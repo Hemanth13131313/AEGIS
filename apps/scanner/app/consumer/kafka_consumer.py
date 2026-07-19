@@ -6,9 +6,8 @@ import asyncio
 import json
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
-from typing import Optional
 
-from confluent_kafka import Consumer, KafkaError, Producer
+from confluent_kafka import Consumer, KafkaError
 import structlog
 
 from app.ensemble.scanner import EnsembleScanner

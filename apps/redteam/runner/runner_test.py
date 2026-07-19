@@ -1,6 +1,5 @@
 import pytest
-import pytest_asyncio
-from datetime import datetime, timezone
+from datetime import datetime
 import httpx
 
 from runner.runner import RedTeamRunner, RunConfig, RunResult

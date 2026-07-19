@@ -5,9 +5,9 @@ RAG poisoning (LLM03 / AML.T0048) or data exfiltration via retrieval (LLM06).
 Phase 4 approach: statistical anomaly detection on retrieval scores.
 Phase 7: Replace with embedding neighborhood analysis using FAISS/hnswlib.
 """
-import numpy as np
 from dataclasses import dataclass
-from typing import Optional
+
+import numpy as np
 import structlog
 
 logger = structlog.get_logger(__name__)
