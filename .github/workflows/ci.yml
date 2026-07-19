@@ -24,19 +24,16 @@ jobs:
       with:
         node-version: '20'
     - name: Generate go.sum
-      continue-on-error: true
       run: |
         cd apps/gateway && go mod tidy
         cd ../policy-engine && go mod tidy
     - name: Run golangci-lint
       uses: golangci/golangci-lint-action@v6
-      continue-on-error: true
       with:
         version: v1.59.1
         working-directory: apps/gateway
     - name: Run golangci-lint
       uses: golangci/golangci-lint-action@v6
-      continue-on-error: true
       with:
         version: v1.59.1
         working-directory: apps/policy-engine

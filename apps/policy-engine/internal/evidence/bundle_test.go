@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"go.uber.org/zap/zaptest"
-	"c:/Users/heman/Documents/projects/Cyber Security/1. AEGIS/apps/policy-engine/internal/evidence"
+	"github.com/aegis-security/aegis/apps/policy-engine/internal/evidence"
 )
 
 func TestGenerate_CreatesZipWithManifest(t *testing.T) {
